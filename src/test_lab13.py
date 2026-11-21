@@ -1,4 +1,4 @@
-import unittest
+
 # Імпортуйте вашу функцію/клас з файлу src.lab13
 from src.lab13 import *
 
@@ -12,39 +12,80 @@ from src.lab13 import *
 #   def test_positive_side(self):
 #     """
 #     Перевірка обчислення площі для додатного значення сторони.
-#     """
-#     self.assertEqual(calculate_area(5), 25)
-#
-#   def test_zero_side(self):
-#     """
-#     Перевірка обчислення площі для нульового значення сторони.
-#     """
-#     self.assertEqual(calculate_area(0), 0)
-#
-#   def test_negative_side(self):
-#     """
-#     Перевірка обробки від'ємного значення сторони.
-#     """
-#     with self.assertRaises(ValueError):
-#       calculate_area(-5)
-#
-# -- Кінець прикладу --
+import unittest
+from lab13 import Queue
 
 
-# Напишіть ваші тести тут
-# Створіть клас, що наслідується від unittest.TestCase
-# та напишіть в ньому тестові методи
-class TestStudentImplementation(unittest.TestCase):
-    def test_placeholder(self):
-        """
-        Цей тест-заглушка перевіряє, що у файлі src/lab13.py є реалізація.
-        Замініть його на власні тести.
-        """
-        # Приклад: перевірка, чи існує певна функція.
-        # self.assertTrue(callable(my_function))
-        pass
+class TestQueue(unittest.TestCase):
+    def setUp(self):
+        self.q = Queue()
+
+    def test_new_queue_is_empty(self):
+        self.assertTrue(self.q.is_empty())
+        self.assertEqual(len(self.q), 0)
+
+    def test_enqueue_size(self):
+        self.q.enqueue(1)
+        self.q.enqueue(2)
+        self.assertEqual(self.q.size(), 2)
+        self.assertFalse(self.q.is_empty())
+
+    def test_dequeue_order(self):
+        for x in (1, 2, 3):
+            self.q.enqueue(x)
+        self.assertEqual(self.q.dequeue(), 1)
+        self.assertEqual(self.q.dequeue(), 2)
+        self.assertEqual(self.q.dequeue(), 3)
+        self.assertTrue(self.q.is_empty())
+
+    def test_peek_does_not_dequeue(self):
+        self.q.enqueue(10)
+        self.q.enqueue(20)
+        self.assertEqual(self.q.peek(), 10)
+        self.assertEqual(self.q.size(), 2)
+
+    def test_peek_after_dequeue(self):
+        self.q.enqueue(10)
+        self.q.enqueue(20)
+        self.q.dequeue()
+        self.assertEqual(self.q.peek(), 20)
+
+    def test_dequeue_empty_raises(self):
+        with self.assertRaises(IndexError):
+            self.q.dequeue()
+
+    def test_peek_empty_raises(self):
+        with self.assertRaises(IndexError):
+            self.q.peek()
+
+    def test_dequeue_until_empty_then_error(self):
+        self.q.enqueue(1)
+        self.q.dequeue()
+        with self.assertRaises(IndexError):
+            self.q.dequeue()
+
+    def test_mixed_operations(self):
+        self.q.enqueue(1)
+        self.q.enqueue(2)
+        self.assertEqual(self.q.dequeue(), 1)
+        self.q.enqueue(3)
+        self.assertEqual(self.q.peek(), 2)
+        self.assertEqual(self.q.size(), 2)
+
+    def test_none_and_mixed_types(self):
+        self.q.enqueue(None)
+        self.q.enqueue([1, 2])
+        self.assertIsNone(self.q.dequeue())
+        self.assertEqual(self.q.dequeue(), [1, 2])
+
+    def test_large_number_of_elements(self):
+        for i in range(1000):
+            self.q.enqueue(i)
+        for i in range(1000):
+            self.assertEqual(self.q.dequeue(), i)
+        self.assertTrue(self.q.is_empty())
 
 
-# Цей блок коду дозволяє запускати тести безпосередньо з командного рядка
+
 if __name__ == '__main__':
     unittest.main()
